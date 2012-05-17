@@ -46,6 +46,7 @@ void setup() {
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
 }
 
+
 void loop() {
 
     dmd.clearScreen( true );
