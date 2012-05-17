@@ -19,12 +19,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
-import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -256,22 +253,12 @@ public class BackgroundUsbService extends IntentService {
 
 			for (Object thePdu : (Object []) arg1.getExtras().get("pdus") ) {
 				SmsMessage theMessage = SmsMessage.createFromPdu((byte []) thePdu);
-				
-				Cursor managedCursor = getContentResolver().query(Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(theMessage.getOriginatingAddress())),
-						new String[]{PhoneLookup.DISPLAY_NAME},
-						null, null, null);
-				
-				String sender;
-				
-				if (managedCursor.moveToFirst()) {
-					sender = managedCursor.getString(managedCursor.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-				} else {
-					sender = theMessage.getOriginatingAddress(); 
-				}
+
+                String sender = theMessage.getOriginatingAddress();
 				
 				Log.d("BackgroundSmsReceiver", "From: " + sender);
 				
-				actionQueue.add(new DisplayText((sender + ": " + theMessage.getMessageBody()).substring(0, 16), 0, 1));
+				actionQueue.add(new DisplayText(sender + ": " + theMessage.getMessageBody(), 0, 1));
 
 				Log.d("BackgroundSmsReceiver", theMessage.getMessageBody());				
 				
