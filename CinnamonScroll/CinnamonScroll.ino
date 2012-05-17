@@ -41,7 +41,8 @@ unsigned long timer_MarqueeUpdate = 0;
 
 #define MAX_MESSAGE_SIZE 160
 #define PREFIX_LENGTH 6 // Prepended to messages e.g. "(327) "
-char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1]; // NUL terminated.
+#define DEFAULT_MESSAGE_STRING = ":: Cinnamon Scroll 0.1 ::"
+char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1] = DEFAULT_MESSAGE_STRING; // NUL terminated.
 
 void setup() {
 
@@ -57,10 +58,6 @@ void setup() {
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
 
   dmd.selectFont(Arial_Black_16);
-
-  // TODO: Do this better
-  activeMessage[0] = ':';
-  activeMessage[1] = '\0';
 
   dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
 }
