@@ -64,7 +64,9 @@ void loop() {
     if (acc.isConnected()) {
       while(acc.available() > 0) {
         char c = (char) acc.read();
-        dmd.drawChar(  (xpos++) * 10,  3, c, GRAPHICS_NORMAL );
+        if ((c != '\n') && (c != '\r')) {
+          dmd.drawChar(  (xpos++) * 10,  3, c, GRAPHICS_NORMAL );
+        }
       }
     }
 
