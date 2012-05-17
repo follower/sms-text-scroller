@@ -1,5 +1,5 @@
 # use glob syntax.
 syntax: glob
 
-bin/*
-gen/*
+*/bin/*
+*/gen/*
