@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+    <!-- TODO: Change this -->
     <usb-accessory model="BackgroundUsbDemo" manufacturer="rancidbacon.com" version="0.1"/>
 </resources>
