@@ -63,7 +63,8 @@ void loop() {
 
     if (acc.isConnected()) {
       while(acc.available() > 0) {
-          dmd.drawChar(  (xpos++) * 10,  3, (char) acc.read(), GRAPHICS_NORMAL );
+        char c = (char) acc.read();
+        dmd.drawChar(  (xpos++) * 10,  3, c, GRAPHICS_NORMAL );
         }
     }
 
