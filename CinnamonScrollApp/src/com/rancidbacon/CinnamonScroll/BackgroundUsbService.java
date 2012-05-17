@@ -1,4 +1,4 @@
-package com.rancidbacon.BackgroundUsbAccessory;
+package com.rancidbacon.CinnamonScroll;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -26,7 +26,6 @@ import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.SmsMessage;
-import android.text.format.Time;
 import android.util.Log;
 
 public class BackgroundUsbService extends IntentService {
@@ -70,7 +69,8 @@ public class BackgroundUsbService extends IntentService {
 	
 	// We use this to catch the USB accessory detached message
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-	    public void onReceive(Context context, Intent intent) {
+	    @Override
+        public void onReceive(Context context, Intent intent) {
 	        final String TAG = "mUsbReceiver";
 
 	        Log.d(TAG,"onReceive entered");
