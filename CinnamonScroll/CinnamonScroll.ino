@@ -92,6 +92,7 @@ void loop() {
 
     scrollCycleComplete = dmd.stepMarquee(-1, 0); // By ignoring the result we scroll indefinitely.
 
+    // TODO: Don't have full blank screen before new message?
     if (scrollCycleComplete && newMessageAvailable) {
       dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
       newMessageAvailable = false;
