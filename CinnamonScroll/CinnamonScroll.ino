@@ -65,7 +65,7 @@ void loop() {
       while(acc.available() > 0) {
         char c = (char) acc.read();
         dmd.drawChar(  (xpos++) * 10,  3, c, GRAPHICS_NORMAL );
-        }
+      }
     }
 
     timer = millis() + 100;
