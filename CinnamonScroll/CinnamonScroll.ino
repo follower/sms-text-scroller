@@ -34,6 +34,10 @@ void ScanDMD() {
 }
 
 
+int xpos = 1;
+
+unsigned long timer = 0;
+
 void setup() {
 
   acc.powerOn();
@@ -44,31 +48,24 @@ void setup() {
 
    //clear/init the DMD pixels held in RAM
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+
+  dmd.selectFont(Arial_Black_16);
+
+  dmd.drawChar(  0,  3, ':', GRAPHICS_NORMAL );
 }
 
 
 void loop() {
 
-    dmd.clearScreen( true );
-    dmd.selectFont(Arial_Black_16);
+  if (millis() > timer) {
 
-    int xpos = 1;
-    dmd.drawChar(  0,  3, ':', GRAPHICS_NORMAL );
-
-    while (1) {
-
-      if (acc.isConnected()) {
-        while(acc.available() > 0) {
-            dmd.drawChar(  (xpos++) * 10,  3, (char) acc.read(), GRAPHICS_NORMAL );
-          }
-      }
-
-
-      unsigned long timer = millis() + 100;
-
-      while (millis() < timer) {
-      }
-
+    if (acc.isConnected()) {
+      while(acc.available() > 0) {
+          dmd.drawChar(  (xpos++) * 10,  3, (char) acc.read(), GRAPHICS_NORMAL );
+        }
     }
+
+    timer = millis() + 100;
+  }
 
 }
