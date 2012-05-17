@@ -34,9 +34,14 @@ void ScanDMD() {
 }
 
 
-int xpos = 1;
+int offset = 0;
 
-unsigned long timer = 0;
+unsigned long timer_UsbPoll = 0;
+unsigned long timer_MarqueeUpdate = 0;
+
+#define MAX_MESSAGE_SIZE 160
+#define PREFIX_LENGTH 6 // Prepended to messages e.g. "(327) "
+char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1]; // NUL terminated.
 
 void setup() {
 
@@ -53,24 +58,40 @@ void setup() {
 
   dmd.selectFont(Arial_Black_16);
 
-  dmd.drawChar(  0,  3, ':', GRAPHICS_NORMAL );
+  // TODO: Do this better
+  activeMessage[0] = ':';
+  activeMessage[1] = '\0';
+
+  dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
 }
 
 
 void loop() {
 
-  if (millis() > timer) {
+  if (millis() > timer_UsbPoll) {
 
     if (acc.isConnected()) {
       while(acc.available() > 0) {
         char c = (char) acc.read();
         if ((c != '\n') && (c != '\r')) {
-          dmd.drawChar(  (xpos++) * 10,  3, c, GRAPHICS_NORMAL );
+          if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
+            activeMessage[offset++] = c;
+            activeMessage[offset] = '\0';
+          }
+        } else if ((c == '\n')) {
+          // TODO: Ensure previous message finished first.
+          dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
+          offset = 0;
         }
       }
     }
 
-    timer = millis() + 100;
+    timer_UsbPoll = millis() + 100;
+  }
+
+  if (millis() > timer_MarqueeUpdate) {
+    dmd.stepMarquee(-1, 0); // By ignoring the result we scroll indefinitely.
+    timer_MarqueeUpdate = millis() + 100;
   }
 
 }
