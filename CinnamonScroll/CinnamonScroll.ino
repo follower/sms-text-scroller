@@ -44,6 +44,9 @@ unsigned long timer_MarqueeUpdate = 0;
 #define DEFAULT_MESSAGE_STRING = ":: Cinnamon Scroll 0.1 ::"
 char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1] = DEFAULT_MESSAGE_STRING; // NUL terminated.
 
+boolean newMessageAvailable = true;
+boolean scrollCycleComplete = true;
+
 void setup() {
 
   delay(250);
@@ -58,8 +61,6 @@ void setup() {
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
 
   dmd.selectFont(Arial_Black_16);
-
-  dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
 }
 
 
@@ -68,17 +69,18 @@ void loop() {
   if (millis() > timer_UsbPoll) {
 
     if (acc.isConnected()) {
-      while(acc.available() > 0) {
-        char c = (char) acc.read();
-        if ((c != '\n') && (c != '\r')) {
-          if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
-            activeMessage[offset++] = c;
-            activeMessage[offset] = '\0';
+      if (!newMessageAvailable) { // Wait for current message to be pushed to display.
+        while(acc.available() > 0) {
+          char c = (char) acc.read();
+          if ((c != '\n') && (c != '\r')) {
+            if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
+              activeMessage[offset++] = c;
+              activeMessage[offset] = '\0';
+            }
+          } else if ((c == '\n')) {
+            newMessageAvailable = true;
+            offset = 0;
           }
-        } else if ((c == '\n')) {
-          // TODO: Ensure previous message finished first.
-          dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
-          offset = 0;
         }
       }
     }
@@ -87,7 +89,14 @@ void loop() {
   }
 
   if (millis() > timer_MarqueeUpdate) {
-    dmd.stepMarquee(-1, 0); // By ignoring the result we scroll indefinitely.
+
+    scrollCycleComplete = dmd.stepMarquee(-1, 0); // By ignoring the result we scroll indefinitely.
+
+    if (scrollCycleComplete && newMessageAvailable) {
+      dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
+      newMessageAvailable = false;
+    }
+
     timer_MarqueeUpdate = millis() + 100;
   }
 
