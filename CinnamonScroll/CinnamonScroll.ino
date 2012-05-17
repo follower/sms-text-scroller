@@ -40,6 +40,8 @@ unsigned long timer = 0;
 
 void setup() {
 
+  delay(250);
+
   acc.powerOn();
 
    //initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
