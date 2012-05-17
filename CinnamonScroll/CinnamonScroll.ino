@@ -41,7 +41,7 @@ unsigned long timer_MarqueeUpdate = 0;
 
 #define MAX_MESSAGE_SIZE 160
 #define PREFIX_LENGTH 6 // Prepended to messages e.g. "(327) "
-#define DEFAULT_MESSAGE_STRING = ":: Cinnamon Scroll 0.1 ::"
+#define DEFAULT_MESSAGE_STRING ":: Cinnamon Scroll 0.1 ::"
 char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1] = DEFAULT_MESSAGE_STRING; // NUL terminated.
 
 boolean newMessageAvailable = true;
