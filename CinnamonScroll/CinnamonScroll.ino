@@ -97,7 +97,7 @@ void loop() {
       newMessageAvailable = false;
     }
 
-    timer_MarqueeUpdate = millis() + 100;
+    timer_MarqueeUpdate = millis() + 10;
   }
 
 }
