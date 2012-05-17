@@ -18,13 +18,24 @@
 #define DISPLAYS_DOWN 1
 DMD dmd(DISPLAYS_ACROSS, DISPLAYS_DOWN);
 
+#define USE_SMS // By which I mean the current "BackgroundUsbService" Android project.
 
+#if !defined(USE_SMS)
 AndroidAccessory acc("Circuits@Home, ltd.",
             "USB Host Shield",
             "Arduino Terminal for Android",
             "1.0",
             "http://www.circuitsathome.com",
             "0000000000000001");
+#else
+AndroidAccessory acc("rancidbacon.com",
+		     "BackgroundUsbDemo",
+		     "Background USB Demo accessory",
+		     "0.1",
+		     "http://rancidbacon.com/",
+		     "0000000000000001");
+#endif
+
 
 
 void ScanDMD() {
@@ -46,6 +57,9 @@ char activeMessage[MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1] = DEFAULT_MESSAGE_STRIN
 
 boolean newMessageAvailable = true;
 boolean scrollCycleComplete = true;
+
+boolean readingSms = false;
+
 
 void setup() {
 
@@ -72,14 +86,51 @@ void loop() {
       if (!newMessageAvailable) { // Wait for current message to be pushed to display.
         while(acc.available() > 0) {
           char c = (char) acc.read();
-          if ((c != '\n') && (c != '\r')) {
-            if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
-              activeMessage[offset++] = c;
-              activeMessage[offset] = '\0';
-            }
-          } else if ((c == '\n')) {
-            newMessageAvailable = true;
-            offset = 0;
+          
+          switch (c) {
+           
+#ifdef USE_SMS            
+            case 0x01:
+              if (readingSms) {
+                // End of message
+                newMessageAvailable = true;
+                offset = 0;
+                
+                readingSms = false;
+              }
+              break;
+              
+            case 0x02:
+              readingSms = true;
+              offset = 0;
+              break;
+
+            case '\n':
+            case '\r':
+              // Ignore 
+              break;
+#else                      
+            case '\n':
+              newMessageAvailable = true;
+              offset = 0;
+              break;
+
+            case '\r':
+              // Ignore 
+              break;
+#endif              
+              
+            default:
+#ifdef USE_SMS            
+              if (readingSms) {
+#endif                
+                if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
+                  activeMessage[offset++] = c;
+                  activeMessage[offset] = '\0';
+                }
+#ifdef USE_SMS                            
+              }
+#endif              
           }
         }
       }
