@@ -255,13 +255,15 @@ public class BackgroundUsbService extends IntentService {
 				SmsMessage theMessage = SmsMessage.createFromPdu((byte []) thePdu);
 
                 String sender = theMessage.getOriginatingAddress();
-				
-				Log.d("BackgroundSmsReceiver", "From: " + sender);
-				
-				actionQueue.add(new DisplayText(sender + ": " + theMessage.getMessageBody(), 0, 1));
 
-				Log.d("BackgroundSmsReceiver", theMessage.getMessageBody());				
-				
+                sender = sender.substring(sender.length() - 3, sender.length());
+
+				Log.d("BackgroundSmsReceiver", "From: " + sender);
+
+                actionQueue.add(new DisplayText("(" + sender + ") " + theMessage.getMessageBody(), 0, 1));
+
+				Log.d("BackgroundSmsReceiver", theMessage.getMessageBody());
+
 				break; // We only care about the first one.
 			}
 
