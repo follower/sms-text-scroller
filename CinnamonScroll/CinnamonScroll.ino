@@ -60,6 +60,15 @@ boolean scrollCycleComplete = true;
 
 boolean readingSms = false;
 
+#define NEW_CODE
+
+#ifdef NEW_CODE
+#define NUM_STORED_MSGS 5
+char storedMessages[NUM_STORED_MSGS][MAX_MESSAGE_SIZE + PREFIX_LENGTH + 1] = {"Txt us yr msg: XXX XXX XXXX",".","..","...","...."};
+unsigned int currentMsgStoreIndex = 1;
+unsigned int nextMsgToShow = 0;
+#endif
+
 
 void setup() {
 
@@ -86,7 +95,9 @@ void loop() {
   if (millis() > timer_UsbPoll) {
 
     if (acc.isConnected()) {
+#ifndef NEW_CODE
       if (!newMessageAvailable) { // Wait for current message to be pushed to display.
+#endif
         while(acc.available() > 0) {
           char c = (char) acc.read();
           
@@ -96,7 +107,15 @@ void loop() {
             case 0x01:
               if (readingSms) {
                 // End of message
+#ifdef NEW_CODE
+                currentMsgStoreIndex++;
+                if (currentMsgStoreIndex >= NUM_STORED_MSGS) {
+                  currentMsgStoreIndex = 1; // Skip 0 as it's permanent.
+                }
+#else
                 newMessageAvailable = true;
+#endif
+
                 offset = 0;
                 
                 readingSms = false;
@@ -127,16 +146,27 @@ void loop() {
 #ifdef USE_SMS            
               if (readingSms) {
 #endif                
+#ifdef NEW_CODE
+                Serial.print(c);
+                if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
+                  storedMessages[currentMsgStoreIndex][offset++] = c;
+                  storedMessages[currentMsgStoreIndex][offset] = '\0';
+                }
+
+#else
                 if (offset < (sizeof(activeMessage)/sizeof(char))) { // TODO: Double check.
                   activeMessage[offset++] = c;
                   activeMessage[offset] = '\0';
                 }
+#endif
 #ifdef USE_SMS                            
               }
 #endif              
           }
         }
+#ifndef NEW_CODE
       }
+#endif
     }
 
     timer_UsbPoll = millis() + 100;
@@ -146,11 +176,22 @@ void loop() {
 
     scrollCycleComplete = dmd.stepMarquee(-1, 0); // By ignoring the result we scroll indefinitely.
 
+#ifdef NEW_CODE
+    if (scrollCycleComplete) {
+      dmd.drawMarquee(storedMessages[nextMsgToShow], strlen(storedMessages[nextMsgToShow]), (32*DISPLAYS_ACROSS)-1, 0);
+
+      nextMsgToShow++;
+      if (nextMsgToShow > NUM_STORED_MSGS) {
+        nextMsgToShow = 0;
+      }
+    }
+#else
     // TODO: Don't have full blank screen before new message?
     if (scrollCycleComplete && newMessageAvailable) {
       dmd.drawMarquee(activeMessage, strlen(activeMessage), (32*DISPLAYS_ACROSS)-1, 0);
       newMessageAvailable = false;
     }
+#endif
 
     timer_MarqueeUpdate = millis() + 30; // TODO: Make scroll speed adjustable.
   }
