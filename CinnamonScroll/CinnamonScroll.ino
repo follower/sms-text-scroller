@@ -68,7 +68,7 @@ void setup() {
   acc.powerOn();
 
    //initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
-   Timer1.initialize( 5000 );           //period in microseconds to call ScanDMD. Anything longer than 5000 (5ms) and you can see flicker.
+   Timer1.initialize( 2500 );           //period in microseconds to call ScanDMD. Anything longer than 5000 (5ms) and you can see flicker.
    Timer1.attachInterrupt( ScanDMD );   //attach the Timer1 interrupt to ScanDMD which goes to dmd.scanDisplayBySPI()
 
    //clear/init the DMD pixels held in RAM
