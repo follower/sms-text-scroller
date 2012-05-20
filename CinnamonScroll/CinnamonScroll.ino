@@ -75,6 +75,9 @@ void setup() {
    dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
 
   dmd.selectFont(Arial_Black_16);
+
+  Serial.begin(9600);
+  Serial.println("start");
 }
 
 
