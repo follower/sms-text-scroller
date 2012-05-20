@@ -149,7 +149,7 @@ void loop() {
       newMessageAvailable = false;
     }
 
-    timer_MarqueeUpdate = millis() + 10; // TODO: Make scroll speed adjustable.
+    timer_MarqueeUpdate = millis() + 30; // TODO: Make scroll speed adjustable.
   }
 
 }
